@@ -1,0 +1,13 @@
+RootCA/certs/**
+RootCA/db/**
+RootCA/newcerts/**
+RootCA/private/**
+RootCA/*.crl
+IntermediateCA/certs/**
+IntermediateCA/db/**
+IntermediateCA/newcerts/**
+IntermediateCA/out/**
+IntermediateCA/private/**
+IntermediateCA/*.crl
+
+
