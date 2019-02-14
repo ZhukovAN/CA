@@ -31,4 +31,5 @@ keytool -importcert -keystore trust.jks -storepass P@ssw0rd -alias IntermediateC
 keytool -importcert -keystore private.jks -storepass P@ssw0rd -alias RootCA -file ../../../$ROOT_CA_NAME/certs/$ROOT_CA_NAME.pem.crt -noprompt
 keytool -importcert -keystore private.jks -storepass P@ssw0rd -alias IntermediateCA -file ../../certs/$CA_NAME.pem.crt -noprompt
 keytool -importkeystore -srckeystore ssl.server.brief.pfx -srcstoretype pkcs12 -destkeystore private.jks -deststoretype JKS -deststorepass P@ssw0rd -srcstorepass P@ssw0rd
+keytool -importkeystore -srckeystore private.jks -destkeystore private.p12 -deststoretype pkcs12 -deststorepass P@ssw0rd -srcstorepass P@ssw0rd
 cd ..
