@@ -15,7 +15,21 @@ mkdir -p $CA_HOME/temp
 
 openssl req -new -config $CA_CONF_DIR/ssl.client.conf -out $CA_HOME/temp/ssl.client.pem.csr -keyout $CA_HOME/temp/ssl.client.pem.key
 openssl ca -config $CA_CONF_DIR/ca.conf -in $CA_HOME/temp/ssl.client.pem.csr -out $CA_HOME/temp/ssl.client.pem.crt -policy extern_pol -extensions client_ext -notext
-openssl x509 -outform DER -in $CA_HOME/temp/ssl.client.pem.crt -out $CA_HOME/temp/ssl.client.der.crt
+OUT_FOLDER=$CA_HOME/out/`openssl x509 -in $CA_HOME/temp/ssl.client.pem.crt -serial -noout | sed -r 's/serial=//g'`
+mkdir -p $OUT_FOLDER
+mv $CA_HOME/temp/* $OUT_FOLDER
+openssl x509 -outform DER -in $OUT_FOLDER/ssl.client.pem.crt -out $OUT_FOLDER/ssl.client.der.crt
 
-cat $CA_HOME/certs/$CA_NAME.pem.crt $ROOT_CA_HOME/certs/$ROOT_CA_NAME.pem.crt > $CA_HOME/temp/ca.chain.pem.crt
-openssl pkcs12 -export -name "SSL client certificate" -inkey $CA_HOME/temp/ssl.client.pem.key -in $CA_HOME/temp/ssl.client.pem.crt -certfile $CA_HOME/temp/ca.chain.pem.crt -out $CA_HOME/temp/ssl.client.p12 -password pass:P@ssw0rd
+cat $CA_HOME/certs/$CA_NAME.pem.crt $ROOT_CA_HOME/certs/$ROOT_CA_NAME.pem.crt > $OUT_FOLDER/ca.chain.pem.crt
+openssl pkcs12 -export -name "SSL client certificate" -inkey $OUT_FOLDER/ssl.client.pem.key -in $OUT_FOLDER/ssl.client.pem.crt -certfile $OUT_FOLDER/ca.chain.pem.crt -out $OUT_FOLDER/ssl.client.full.pfx -password pass:P@ssw0rd
+openssl pkcs12 -export -name "SSL client certificate" -inkey $OUT_FOLDER/ssl.client.pem.key -in $OUT_FOLDER/ssl.client.pem.crt -out $OUT_FOLDER/ssl.client.brief.pfx -password pass:P@ssw0rd
+
+# Generate Java keystore
+cd $OUT_FOLDER
+keytool -importcert -keystore trust.jks -storepass P@ssw0rd -alias RootCA -file ../../../$ROOT_CA_NAME/certs/$ROOT_CA_NAME.pem.crt -noprompt
+keytool -importcert -keystore trust.jks -storepass P@ssw0rd -alias IntermediateCA -file ../../certs/$CA_NAME.pem.crt -noprompt
+keytool -importcert -keystore private.jks -storepass P@ssw0rd -alias RootCA -file ../../../$ROOT_CA_NAME/certs/$ROOT_CA_NAME.pem.crt -noprompt
+keytool -importcert -keystore private.jks -storepass P@ssw0rd -alias IntermediateCA -file ../../certs/$CA_NAME.pem.crt -noprompt
+keytool -importkeystore -srckeystore ssl.client.brief.pfx -srcstoretype pkcs12 -destkeystore private.jks -deststoretype JKS -deststorepass P@ssw0rd -srcstorepass P@ssw0rd
+keytool -importkeystore -srckeystore private.jks -destkeystore private.p12 -deststoretype pkcs12 -deststorepass P@ssw0rd -srcstorepass P@ssw0rd
+cd ..
