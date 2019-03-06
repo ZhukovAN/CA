@@ -3,7 +3,7 @@ CA_BIN_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 CA_CONF_DIR=$CA_BIN_DIR
 CA_HOME=$(cd $CA_BIN_DIR/..; pwd)
 CA_NAME=RootCA
-CA_KEYLEN=2048
+CA_KEYLEN=4096
 echo "Using CA_HOME=$CA_HOME"
 
 rm -rf $CA_HOME/private
