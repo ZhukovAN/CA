@@ -23,6 +23,8 @@ openssl x509 -outform DER -in $OUT_FOLDER/ssl.server.pem.crt -out $OUT_FOLDER/ss
 cat $CA_HOME/certs/$CA_NAME.pem.crt $ROOT_CA_HOME/certs/$ROOT_CA_NAME.pem.crt > $OUT_FOLDER/ca.chain.pem.crt
 openssl pkcs12 -export -name "SSL server certificate" -inkey $OUT_FOLDER/ssl.server.pem.key -in $OUT_FOLDER/ssl.server.pem.crt -certfile $OUT_FOLDER/ca.chain.pem.crt -out $OUT_FOLDER/ssl.server.full.pfx -password pass:P@ssw0rd
 openssl pkcs12 -export -name "SSL server certificate" -inkey $OUT_FOLDER/ssl.server.pem.key -in $OUT_FOLDER/ssl.server.pem.crt -out $OUT_FOLDER/ssl.server.brief.pfx -password pass:P@ssw0rd
+openssl pkcs12 -in $OUT_FOLDER/ssl.server.full.pfx -out $OUT_FOLDER/ssl.server.full.pem -passin pass:P@ssw0rd -passout pass:P@ssw0rd
+openssl pkcs12 -in $OUT_FOLDER/ssl.server.brief.pfx -out $OUT_FOLDER/ssl.server.brief.pem -passin pass:P@ssw0rd -passout pass:P@ssw0rd
 
 # Generate Java keystore
 cd $OUT_FOLDER
