@@ -14,11 +14,13 @@ rm -rf $CA_HOME/private
 rm -rf $CA_HOME/certs
 rm -rf $CA_HOME/newcerts
 rm -rf $CA_HOME/db
+rm -rf $CA_HOME/out
 rm -rf $CA_HOME/*.crl
 mkdir -p $CA_HOME/private
 mkdir -p $CA_HOME/certs
 mkdir -p $CA_HOME/newcerts
 mkdir -p $CA_HOME/db
+mkdir -p $CA_HOME/out
 
 sed -i "s|^\(dir\s*=\s*\)\([^#]\+\)\(\s\+# Top dir\)|\1${CA_HOME}\3|g" $CA_BIN_DIR/ca.conf
 
