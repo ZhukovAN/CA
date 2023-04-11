@@ -5,6 +5,14 @@ There's a lot of HOWTO's about using **OpenSSL**, but sometimes those manuals to
 
 This repository is about how to create your own two-tier CA hierarchy that allows you to use bash scripts to generate certificates for different purposes like server- or client-side SSL authentication, VPN, etc.
 
+# Prerequisites
+``` bash
+# Need keytool from JRE
+apt install default-jre
+# Need uuidgen to generate unique identifiers
+apt-get install uuid-runtime
+```
+
 # How to start
 Clone or download this repository as zip file. There'll be two folders inside: RootCA and Intermediate CA. Root CA allows you to sign certificate signing request and generate Intermediate CA certificate. Intermediate CA used to generate end-user certificates. 
 
