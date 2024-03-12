@@ -29,7 +29,6 @@ initializeRootCa() {
     chmod 660 ${ROOT_CA_DATA}/private/key.pem
 
     echo "Generate and self-sign certificate signing request"
-    ls -la 
     openssl req -new -config ${ROOT_CA_CONF}/ca.conf -out ${ROOT_CA_DATA}/csr.pem -key ${ROOT_CA_DATA}/private/key.pem
     openssl ca -batch -selfsign -config ${ROOT_CA_CONF}/ca.conf -in ${ROOT_CA_DATA}/csr.pem -out ${ROOT_CA_DATA}/certs/ca.pem -extensions root_ca_ext -notext
     openssl x509 -outform DER -in ${ROOT_CA_DATA}/certs/ca.pem -out ${ROOT_CA_DATA}/certs/ca.crt
