@@ -3,9 +3,9 @@
 CA_BIN_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 CA_CONF_DIR=$CA_BIN_DIR
 CA_HOME=$(cd $CA_BIN_DIR/..; pwd)
-CA_NAME=IntermediateCA
+CA_NAME=intermediate-ca
 
-ROOT_CA_NAME=RootCA
+ROOT_CA_NAME=root-ca
 ROOT_CA_HOME=$(cd $CA_BIN_DIR/../../$ROOT_CA_NAME; pwd)
 
 echo "Using CA_HOME=$CA_HOME"
@@ -28,10 +28,10 @@ openssl pkcs12 -in $OUT_FOLDER/ssl.server.brief.pfx -out $OUT_FOLDER/ssl.server.
 
 # Generate Java keystore
 cd $OUT_FOLDER
-keytool -importcert -keystore trust.jks -storepass P@ssw0rd -alias RootCA -file ../../../$ROOT_CA_NAME/certs/$ROOT_CA_NAME.pem.crt -noprompt
-keytool -importcert -keystore trust.jks -storepass P@ssw0rd -alias IntermediateCA -file ../../certs/$CA_NAME.pem.crt -noprompt
-keytool -importcert -keystore private.jks -storepass P@ssw0rd -alias RootCA -file ../../../$ROOT_CA_NAME/certs/$ROOT_CA_NAME.pem.crt -noprompt
-keytool -importcert -keystore private.jks -storepass P@ssw0rd -alias IntermediateCA -file ../../certs/$CA_NAME.pem.crt -noprompt
+keytool -importcert -keystore trust.jks -storepass P@ssw0rd -alias 'Root CA' -file ../../../$ROOT_CA_NAME/certs/$ROOT_CA_NAME.pem.crt -noprompt
+keytool -importcert -keystore trust.jks -storepass P@ssw0rd -alias 'Intermediate CA' -file ../../certs/$CA_NAME.pem.crt -noprompt
+keytool -importcert -keystore private.jks -storepass P@ssw0rd -alias 'Root CA' -file ../../../$ROOT_CA_NAME/certs/$ROOT_CA_NAME.pem.crt -noprompt
+keytool -importcert -keystore private.jks -storepass P@ssw0rd -alias 'Intermediate CA' -file ../../certs/$CA_NAME.pem.crt -noprompt
 keytool -importkeystore -srckeystore ssl.server.brief.pfx -srcstoretype pkcs12 -destkeystore private.jks -deststoretype JKS -deststorepass P@ssw0rd -srcstorepass P@ssw0rd
 keytool -importkeystore -srckeystore private.jks -destkeystore private.p12 -deststoretype pkcs12 -deststorepass P@ssw0rd -srcstorepass P@ssw0rd
 cd ..
