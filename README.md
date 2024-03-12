@@ -18,7 +18,12 @@ docker build \
 ```
 ## Use CA image
 When started, CA image container checks its mapped `/opt/ca/data` folder for a presence of a root- and intermediate CA private keys. If those are not found, CA data initialization procedure is started. That procedure includes:
-- CA files / folder structure creation;
+- CA files / folder structure creation:
+    - `${CA}/data/certs`: DER- and PEM-encoded CA certificates;
+    - `${CA}/data/crl`: DER- and PEM-encoded certificate revocation lists;
+    - `${CA}/data/db`: internal OpenSSL database files;
+    - `${CA}/data/out`: certificates signed by CA, see details [here](#generated-files);
+    - `${CA}/data/private`: unencrypted PEM-encoded CA private key
 - generation of root CA self-signed certificate;
 - generation of intermediate CA certificate signing request;
 - sign intermediate CA's CSR with root CA private key
@@ -36,13 +41,13 @@ docker run --rm -it \
   generateSslServerCertificate DNS:*.ptdemo.local
 ```
 ### Generated files
-Files generated during certificate generation process are copied into container's `/opt/ca/data/intermediate-ca/out/${serial}` folder. Some files are hold private keys and use P@ssw0rd for protection:
-- `key.pem` - unencrypted certificate private key
-- `csr.pem` - certificate signing request stored as PEM file
-- `server.crt` and `server.pem` - generated certificate stored as DER- and PEM files
-- `server.brief.pem` and `server.brief.pfx` - PKCS#12-encoded certificate / key container. Doesn't contain CA certificates
-- `server.full.pem` and `server.full.pfx` - PKCS#12-encoded certificate / key container. Does contain CA certificates
-- `ca.pem` - PEM-encoded CA certificates chain file that includes both root- and intermediate CA certificates
-- `trust.jks` - Java keystore file that contains two CA certificates marked as trusted
-- `private.jks` - Java keystore file that contains two CA certificates marked as trusted and generated certificate and key
-- `private.p12` - Java Keytool clone of JKS keystore that uses PKCS#12 format instead of proprientary JKS. Contents are the same as for `private.jks`
+Files generated during certificate generation process are copied into container's `/opt/ca/data/${CA}/out/${serial}` folder. Some files are hold private keys and use P@ssw0rd for protection. For SSL server certificates following files are generated:
+- `key.pem` - unencrypted certificate private key;
+- `csr.pem` - certificate signing request stored as PEM file;
+- `server.crt` and `server.pem` - generated certificate stored as DER- and PEM files;
+- `server.brief.pem` and `server.brief.pfx` - PKCS#12-encoded certificate / key container. Doesn't contain CA certificates;
+- `server.full.pem` and `server.full.pfx` - PKCS#12-encoded certificate / key container. Includes full CA certificate chain;
+- `ca.pem` - PEM-encoded CA certificates chain file that includes both root- and intermediate CA certificates;
+- `trust.jks` - Java keystore file that contains two CA certificates marked as trusted;
+- `private.jks` - Java keystore file that contains two CA certificates marked as trusted and generated certificate and key;
+- `private.p12` - Java Keytool clone of JKS keystore that uses PKCS#12 format instead of proprientary JKS. Contents are the same as for `private.jks`;
