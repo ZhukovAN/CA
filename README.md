@@ -16,6 +16,7 @@ docker build \
   --build-arg ORGANIZATION=YourDomain.ORG \
   --tag yourdomain/ca:latest .
 ```
+Or you may omit `ORGANIZATION` build argument and use `--env` option flag while running container.
 ## Use CA image
 When started, CA image container checks its mapped `/opt/ca/data` folder for a presence of a root- and intermediate CA private keys. If those are not found, CA data initialization procedure is started. That procedure includes:
 - CA files / folder structure creation:
