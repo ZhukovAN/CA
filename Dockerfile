@@ -1,11 +1,11 @@
 FROM alpine:3.18.4
 
+# Install prerequisites
+RUN apk add bash openjdk11 uuidgen openssl mc nano
+
 # Define default organization name CA belongs to
 ARG ORGANIZATION=PTDemo.LOCAL
 ENV ORGANIZATION=${ORGANIZATION}
-
-# Install prerequisites
-RUN apk add bash openjdk11 uuidgen openssl mc nano
 
 COPY assets/conf/ /opt/ca/conf
 COPY assets/bin/ /opt/ca/bin
