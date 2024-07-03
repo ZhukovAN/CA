@@ -11,4 +11,6 @@ elif [ ! -f ${INTERMEDIATE_CA_DATA}/private/key.pem ]; then
     initializeIntermediateCa
 fi
 
-${@}
+command="${1}"
+shift
+${command} "${@}"

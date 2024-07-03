@@ -36,10 +36,17 @@ After startup check container's entry point script executes certificate generati
 Following command generates SSL server certificate with subjectAlternativeName set to `DNS:*.ptdemo.local` value
 ``` bash
 docker run --rm -it \
-  --volume ptdemo-ca-conf:/opt/ca/conf \
   --volume ptdemo-ca-data:/opt/ca/data \
   ptdemo/ca:latest \
   generateSslServerCertificate DNS:*.ptdemo.local
+```
+### Generate "out of scope" intermediate CA certificate
+Sometimes we need to generate private key and intermediate CA certificate for out of scope certificate operations. For example, we may need to provide Kubernetes with trusted intermediate certificate and key to generate bunch of certificates for automated ETCD, API server, kubelets etc. certificate provisioning during cluster initialization phase. Following command generates root CA's subordinate authority certificate and key with subject set to `PTDemo.LOCAL K8s Intermediate CA` value
+``` bash
+docker run --rm -it \
+  --volume ptdemo-ca-data:/opt/ca/data \
+  ptdemo/ca:latest \
+  generateIntermediateCaCertificate "PTDemo.LOCAL K8s Intermediate CA"
 ```
 ### Generated files
 Files generated during certificate generation process are copied into container's `/opt/ca/data/${CA}/out/${serial}` folder. Some files are hold private keys and use P@ssw0rd for protection. For SSL server certificates following files are generated:
