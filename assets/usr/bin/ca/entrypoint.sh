@@ -1,6 +1,5 @@
 #!/bin/bash
 
-export CA=/opt/ca
 source utils/env.sh
 source utils/utils.sh
 
