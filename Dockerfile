@@ -1,23 +1,18 @@
-FROM alpine:3.18.4
+ARG SOURCE_TOOL_IMAGE=alpine:3.18.4
+FROM ${SOURCE_TOOL_IMAGE}
 
 # Install prerequisites
-RUN apk add bash openjdk11 uuidgen openssl mc nano
+RUN apk add bash openjdk11 uuidgen openssl
 
-# Define default organization name CA belongs to
-ARG ORGANIZATION=PTDemo.LOCAL
-ENV ORGANIZATION=${ORGANIZATION}
+COPY assets/ /
 
-COPY assets/conf/ /opt/ca/conf
-COPY assets/bin/ /opt/ca/bin
 RUN \
-  sed -i "s|___ORGANIZATION_PLACEHOLDER___|${ORGANIZATION}\3|g" /opt/ca/conf/root-ca/ca.conf && \
-  sed -i "s|___ORGANIZATION_PLACEHOLDER___|${ORGANIZATION}\3|g" /opt/ca/conf/intermediate-ca/ca.conf && \
-  chmod a+x /opt/ca/bin/entrypoint.sh
+  chmod a+x /usr/bin/ca/entrypoint.sh
 
-VOLUME [ "/opt/ca/data" ]
+VOLUME [ "/var/lib/ca", "/etc/ca" ]
 
 # Where scripts are to be executed from
-WORKDIR /opt/ca/bin
+WORKDIR /usr/bin/ca
 
 # Define entry point that will be executed every time container is activated
-ENTRYPOINT [ "/opt/ca/bin/entrypoint.sh" ]
+ENTRYPOINT [ "/usr/bin/ca/entrypoint.sh" ]

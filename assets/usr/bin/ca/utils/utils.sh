@@ -90,15 +90,11 @@ initializeIntermediateCa() {
 
 generateSslServerCertificate() {
     TMP=`mktemp -d`
-    # Create temp configuration file and replace Organization and SAN placeholders with actual values
-    cp ${INTERMEDIATE_CA_CONF}/ssl.server.request.conf ${TMP}/request.conf
-    sed -i "s|___ORGANIZATION_PLACEHOLDER___|${ORGANIZATION}\3|g" ${TMP}/request.conf
-    sed -i "s|___SAM_PLACEHOLDER___|${1}\3|g" ${TMP}/request.conf
-    openssl req -new \
-      -config ${TMP}/request.conf \
+    # Use environment variable to pass SAN parameter to request    
+    SAM=${1} openssl req -new \
+      -config ${INTERMEDIATE_CA_CONF}/ssl.server.request.conf \
       -out ${TMP}/csr.pem \
       -keyout ${TMP}/key.pem
-    rm ${TMP}/request.conf
     
     # Sign request
     openssl ca -batch \
@@ -133,15 +129,12 @@ generateSslServerCertificate() {
 
 generateIntermediateCaCertificate() {
     TMP=`mktemp -d`
-    # Create temp configuration file and replace Organization and Subject placeholders with actual values
-    cp ${ROOT_CA_CONF}/intermediate.ca.request.conf ${TMP}/request.conf
-    sed -i "s|___ORGANIZATION_PLACEHOLDER___|${ORGANIZATION}\3|g" ${TMP}/request.conf
-    sed -i "s|___INTERMEDIATE_CA_PLACEHOLDER___|${1}\3|g" ${TMP}/request.conf
-    openssl req -new \
-      -config ${TMP}/request.conf \
+    # Pass custom intermediate CA common name as environment variable
+    cat ${ROOT_CA_CONF}/intermediate.ca.request.conf
+    INTERMEDIATE_CA_CN=${1} openssl req -new \
+      -config ${ROOT_CA_CONF}/intermediate.ca.request.conf \
       -out ${TMP}/csr.pem \
       -keyout ${TMP}/key.pem
-    rm ${TMP}/request.conf
     
     # Sign request
     openssl ca -batch \
