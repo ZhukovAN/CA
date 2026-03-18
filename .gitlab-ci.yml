@@ -1,0 +1,43 @@
+variables:
+  DESTINATION_IMAGE_VERSION: "1.0.0"
+  DESTINATION_IMAGE_TAG: "${IMAGE_TAG_PREFIX}/ca:${DESTINATION_IMAGE_VERSION}"
+
+stages:
+  - image
+  - test
+
+docker:
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+  stage: image
+  image: ${IMAGE_PROXY_SERVER}/docker:${DOCKER_VERSION}
+  services:
+    - name: ${IMAGE_PROXY_SERVER}/$IMAGE_TAG_PREFIX/docker:${DOCKER_VERSION}-dind
+      alias: docker
+  before_script:
+    - echo ${IMAGE_REGISTRY_PASSWORD} | docker login --username ${IMAGE_REGISTRY_USER} --password-stdin ${IMAGE_REGISTRY_SERVER}
+  script:
+    - docker build .
+      --build-arg SOURCE_TOOL_IMAGE="${IMAGE_PROXY_SERVER}/alpine:3.18.4"
+      --tag ${IMAGE_REGISTRY_SERVER}/${DESTINATION_IMAGE_TAG}
+    - docker push ${IMAGE_REGISTRY_SERVER}/${DESTINATION_IMAGE_TAG}
+
+docker-test:
+  stage: test
+  image: 
+    name: ${IMAGE_PROXY_SERVER}/${DESTINATION_IMAGE_TAG}
+    entrypoint: [""]
+    pull_policy: always
+  script:
+    - cd /usr/bin/ca/
+    - echo "Initialize root and subordinate CA"
+    - ./entrypoint.sh
+    - echo "Check root CA certificate"
+    - if [ ! -f "/var/lib/ca/root/certs/ca.pem" ]; then echo 'Root CA certificate not found'; exit 1; fi
+    - echo "Check intermediate CA certificate"
+    - if [ ! -f "/var/lib/ca/intermediate/certs/ca.pem" ]; then echo 'Intermediate CA certificate not found'; exit 1; fi
+    - echo "Generate SSL server certificate"
+    - SERIAL=$(cat /var/lib/ca/intermediate/db/crt.srl | tr '[:lower:]' '[:upper:]')
+    - ./entrypoint.sh generateSslServerCertificate "DNS:*.ptdemo.local"
+    - echo "Check SSL CA certificate"
+    - if [ ! -f "/var/lib/ca/intermediate/out/$SERIAL/server.pem" ]; then echo 'SSL server certificate not found'; exit 1; fi
